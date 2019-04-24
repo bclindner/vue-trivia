@@ -1,12 +1,15 @@
 <template>
   <div>
     <p>OpenTriviaDB</p>
+    <p v-if="status == 'LOADING'">Loading trivia...</p>
+    <p v-if="status == 'FAILED'">Failed to load trivia!</p>
     <ol v-if="status == 'READY'">
-      <li class="trivia" v-for="trivia in trivias" :key="trivia.question">
+      <li class="trivia" v-for="trivia in triviaList" :key="trivia.question">
         <p v-html="trivia.question"/>
         <ol type="A">
-          <li class="correct answer" v-html="trivia.correct_answer"/>
-          <li class="incorrect answer" v-for="answer in trivia.incorrect_answers" :key="answer" v-html="answer"/>
+          <li  v-for="answer in trivia.answers" :key="answer.text" >
+            <div class="answer" :class="[answer.correct ? 'correct' : 'incorrect']" v-html="answer.text"/>
+          </li>
         </ol>
       </li>
     </ol>
@@ -14,20 +17,19 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { getTrivia } from '../utils/opentriviadb'
 
 export default {
   name: 'trivia-app',
   data: () => ({
     // statuses: LOADING, FAILED, READY
     status: 'LOADING',
-    trivias: []
+    triviaList: [],
+    currentTrivia: -1
   }),
   async mounted () {
     try {
-      // Get trivia from the API and set it in our data
-      const resp = await axios.get('https://opentdb.com/api.php?amount=10')
-      this.trivias = resp.data.results
+      this.triviaList = await getTrivia(10)
       this.status = 'READY'
     } catch (err) {
       console.error(err)
@@ -47,6 +49,7 @@ export default {
   border-radius: 2px;
   color: white;
   max-width: 400px;
+  text-align: center;
 }
 .correct {
   background-color: #3ee86b;

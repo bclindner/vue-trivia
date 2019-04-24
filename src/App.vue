@@ -18,6 +18,6 @@ export default {
 <style>
 #app {
   font-family: sans-serif;
-  font-weight: light;
+  font-weight: 400;
 }
 </style>
