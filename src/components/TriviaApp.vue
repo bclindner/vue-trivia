@@ -5,18 +5,18 @@
     <p v-if="status == 'FAILED'">Failed to load trivia!</p>
     <div v-if="status == 'READY'">
       <div v-if="questionState != 'DONE'">
-      <p>Score: {{ score }}</p>
-      <p><strong>Question {{questionNumber}}</strong></p>
-      <p><strong>{{ currentQuestion.category }}<br/>({{ currentQuestion.difficulty }} difficulty)</strong></p>
-      <p class="trivia" v-html="currentQuestion.question"/>
-      <ol class="answer-list" type="A">
-        <li v-for="(answer, index) in currentQuestion.answers" :key="answer.text" @click="verifyAnswer(index)">
-          <div class="answer" :class="answerClassObject(answer.correct)" v-html="answer.text"/>
-        </li>
-      </ol>
-      <p v-if="questionState == 'CORRECT'">Correct!</p>
-      <p v-if="questionState == 'INCORRECT'">Incorrect...</p>
-      <button v-if="readyToContinue" @click="goToNext()">Continue</button>
+        <p>Score: {{ score }}</p>
+        <p><strong>Question {{questionNumber}}</strong></p>
+        <p><strong>{{ currentQuestion.category }}</strong><br/>({{ currentQuestion.difficulty }} difficulty)</p>
+        <p class="trivia" v-html="currentQuestion.question"/>
+        <ol class="answer-list" type="A">
+          <li v-for="(answer, index) in currentQuestion.answers" :key="answer.text" @click="verifyAnswer(index)">
+            <div class="answer" :class="answerClassObject(answer.correct)" v-html="answer.text"/>
+          </li>
+        </ol>
+        <p v-if="questionState == 'CORRECT'">Correct!</p>
+        <p v-if="questionState == 'INCORRECT'">Incorrect...</p>
+        <button v-if="readyToContinue" @click="goToNext()">Continue</button>
       </div>
       <div v-else>
         <p>Your scored {{ score }} points!</p>
@@ -29,7 +29,9 @@
 </template>
 
 <script>
-import { getTrivia } from '../utils/opentriviadb'
+import { getTrivia, getSessionToken } from '../utils/opentriviadb'
+
+const questionsPerRound = 10
 
 export default {
   name: 'trivia-app',
@@ -41,7 +43,8 @@ export default {
     // states: ANSWERING, CORRECT, INCORRECT, DONE
     questionState: 'ANSWERING',
     questionNumber: 0,
-    score: 0
+    score: 0,
+    sessionToken: ''
   }),
   computed: {
     readyToContinue () {
@@ -55,7 +58,10 @@ export default {
       this.questionNumber = 0
       this.status = 'LOADING'
       try {
-        this.triviaList = await getTrivia(10)
+        if (this.sessionToken.length === 0) {
+          this.sessionToken = await getSessionToken()
+        }
+        this.triviaList = await getTrivia(questionsPerRound, this.sessionToken)
         this.goToNext()
         this.status = 'READY'
       } catch (err) {

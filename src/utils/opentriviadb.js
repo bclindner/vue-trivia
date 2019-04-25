@@ -26,11 +26,21 @@ const answer = (text, correct) => ({
 
 /**
  * Get trivia from the OpenTriviaDB API, mapping a bit to help with trivia display.
+ * @param {Number} amount - Amount of trivia entries to get.
+ * @param {String} token - Session token to use, if any.
+ * @author Brian Lindner <brian@bclindner.com>
  */
-export const getTrivia = async (amount = 10) => {
+export const getTrivia = async (amount = 10, token = '') => {
   // Get trivia from the API and set it in our data
   const resp = await axios.get('https://opentdb.com/api.php', {
-    params: { amount }
+    params: { amount, token }
   })
   return resp.data.results.map(mapTrivia)
 }
+
+/**
+ * Get a session token for use in the OpenTDB API.
+ * @returns {String} A session token to use in getTrivia.
+ * @author Brian Lindner <brian@bclindner.com>
+ */
+export const getSessionToken = async () => (await axios.get('https://opentdb.com/api_token.php?command=request')).data.token
