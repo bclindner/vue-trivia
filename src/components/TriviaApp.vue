@@ -4,13 +4,27 @@
     <p v-if="status == 'LOADING'">Loading trivia...</p>
     <p v-if="status == 'FAILED'">Failed to load trivia!</p>
     <div v-if="status == 'READY'">
-      <span class="trivia" v-html="triviaList[currentTrivia].question"/>
+      <div v-if="questionState != 'DONE'">
+      <p>Score: {{ score }}</p>
+      <p><strong>Question {{questionNumber}}</strong></p>
+      <p><strong>{{ currentQuestion.category }}<br/>({{ currentQuestion.difficulty }} difficulty)</strong></p>
+      <p class="trivia" v-html="currentQuestion.question"/>
       <ol class="answer-list" type="A">
-        <li v-for="answer in triviaList[currentTrivia].answers" :key="answer.text">
-          <div class="answer unknown" v-html="answer.text"/>
+        <li v-for="(answer, index) in currentQuestion.answers" :key="answer.text" @click="verifyAnswer(index)">
+          <div class="answer" :class="answerClassObject(answer.correct)" v-html="answer.text"/>
         </li>
       </ol>
+      <p v-if="questionState == 'CORRECT'">Correct!</p>
+      <p v-if="questionState == 'INCORRECT'">Incorrect...</p>
+      <button v-if="readyToContinue" @click="goToNext()">Continue</button>
+      </div>
+      <div v-else>
+        <p>Your scored {{ score }} points!</p>
+        <button @click="getTrivia()">Restart</button>
+      </div>
     </div>
+    <hr/>
+    <p>&copy; Brian Lindner, 2019. Trivia questions taken from <a href="https://opentdb.com/">OpenTDB</a>.</p>
   </div>
 </template>
 
@@ -23,16 +37,63 @@ export default {
     // statuses: LOADING, FAILED, READY
     status: 'LOADING',
     triviaList: [],
-    currentTrivia: 0
+    currentQuestion: {},
+    // states: ANSWERING, CORRECT, INCORRECT, DONE
+    questionState: 'ANSWERING',
+    questionNumber: 0,
+    score: 0
   }),
-  async mounted () {
-    try {
-      this.triviaList = await getTrivia(10)
-      this.status = 'READY'
-    } catch (err) {
-      console.error(err)
-      this.status = 'FAILED'
+  computed: {
+    readyToContinue () {
+      return this.questionState === 'CORRECT' || this.questionState === 'INCORRECT'
     }
+  },
+  methods: {
+    async getTrivia () {
+      // Reset the game
+      this.score = 0
+      this.questionNumber = 0
+      this.status = 'LOADING'
+      try {
+        this.triviaList = await getTrivia(10)
+        this.goToNext()
+        this.status = 'READY'
+      } catch (err) {
+        console.error(err)
+        this.status = 'FAILED'
+      }
+    },
+    verifyAnswer (index) {
+      if (this.questionState !== 'ANSWERING') { return }
+      if (this.currentQuestion.answers[index].correct) {
+        this.score += 1
+        this.questionState = 'CORRECT'
+      } else {
+        this.questionState = 'INCORRECT'
+      }
+    },
+    goToNext () {
+      if (this.triviaList.length) {
+        this.currentQuestion = this.triviaList.pop()
+        this.questionNumber += 1
+        this.questionState = 'ANSWERING'
+      } else {
+        this.questionState = 'DONE'
+      }
+    },
+    answerClassObject (correct) {
+      switch (this.questionState) {
+        case 'CORRECT':
+        case 'INCORRECT':
+          return { correct, incorrect: !correct }
+        case 'ANSWERING':
+        default:
+          return { 'unknown': true }
+      }
+    }
+  },
+  async mounted () {
+    this.getTrivia()
   }
 }
 </script>
@@ -61,9 +122,9 @@ export default {
   border-radius: 2px;
   color: white;
   text-align: center;
+  transition: 0.2s ease;
 }
 .unknown {
-  transition: 0.2s ease;
   background-color: #875fd7;
 }
 .unknown:hover {
