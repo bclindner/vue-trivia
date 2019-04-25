@@ -1,0 +1,22 @@
+---
+kind: pipeline
+name: arm-build-deploy
+
+platform:
+  os: linux
+  arch: arm
+
+steps:
+- name: build
+  image: node
+  commands:
+  - npm install
+  - npm run build
+- name: publish
+  image: plugins/gh-pages
+  settings:
+    username:
+      from_secret: github_username
+    password:
+      from_secret: github_password
+    pages_directory: dist/
