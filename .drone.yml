@@ -15,8 +15,7 @@ steps:
 - name: publish
   image: plugins/gh-pages
   settings:
-    username:
-      from_secret: github_username
-    password:
-      from_secret: github_password
+    ssh_key:
+      from_secret: ssh_key
+    upstream_name: git@github.com:bclindner/vue-trivia
     pages_directory: dist/
