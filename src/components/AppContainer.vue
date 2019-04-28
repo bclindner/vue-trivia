@@ -1,4 +1,4 @@
-<template functional>
+<template>
   <div class="container">
     <h1>Trivia</h1>
     <slot/>

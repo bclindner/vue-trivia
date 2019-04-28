@@ -1,11 +1,13 @@
 <template>
-  <app-container>
+  <div>
     <p v-if="status == 'LOADING'">Loading trivia...</p>
     <p v-if="status == 'FAILED'">Failed to load trivia!</p>
     <div v-if="status == 'READY'">
       <div v-if="questionState != 'DONE'">
         <p>Score: {{ score }}</p>
-        <p><strong>Question {{ questionNumber }}</strong></p>
+        <h3>
+          Question {{ questionNumber }}
+        </h3>
         <p><strong>{{ currentQuestion.category }}</strong><br/>({{ currentQuestion.difficulty }} difficulty)</p>
         <p class="trivia" v-html="currentQuestion.question"/>
         <trivia-list :question-state="questionState" :answers="currentQuestion.answers" @answer="verifyAnswer"/>
@@ -16,23 +18,32 @@
       <div v-else>
         <p>Your scored {{ score }} points!</p>
         <button @click="getTrivia()">Restart</button>
+        <p>
+          <router-link to="/">Configure Trivia</router-link>
+        </p>
       </div>
     </div>
-  </app-container>
+  </div>
 </template>
 
 <script>
 import { getTrivia, getSessionToken } from '@/utils/opentriviadb'
 import TriviaList from '@/components/TriviaList'
-import AppContainer from '@/components/AppContainer'
-
-const questionsPerRound = 10
 
 export default {
   name: 'trivia-app',
+  props: {
+    questionsPerRound: {
+      type: String,
+      default: '0'
+    },
+    categoryID: {
+      type: String,
+      default: '0'
+    }
+  },
   components: {
-    TriviaList,
-    AppContainer
+    TriviaList
   },
   data: () => ({
     // statuses: LOADING, FAILED, READY
@@ -60,7 +71,7 @@ export default {
         if (this.sessionToken.length === 0) {
           this.sessionToken = await getSessionToken()
         }
-        this.triviaList = await getTrivia(questionsPerRound, this.sessionToken)
+        this.triviaList = await getTrivia(this.questionsPerRound, this.sessionToken, this.categoryID)
         this.goToNext()
         this.status = 'READY'
       } catch (err) {
@@ -92,6 +103,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-</style>

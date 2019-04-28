@@ -30,13 +30,20 @@ const answer = (text, correct) => ({
  * @param {String} token - Session token to use, if any.
  * @author Brian Lindner <brian@bclindner.com>
  */
-export const getTrivia = async (amount = 10, token = '') => {
+export const getTrivia = async (amount = 10, token = '', category = '') => {
   // Get trivia from the API and set it in our data
   const resp = await axios.get('https://opentdb.com/api.php', {
-    params: { amount, token }
+    params: { amount, token, category }
   })
   return resp.data.results.map(mapTrivia)
 }
+
+/**
+ * Get all categories in the OpenTDB API.
+ * @returns {Array} An array of categories with id and name fields.
+ * @author Brian Lindner <brian@bclindner.com>
+ */
+export const getCategories = async () => (await axios.get('https://opentdb.com/api_category.php')).data.trivia_categories
 
 /**
  * Get a session token for use in the OpenTDB API.
