@@ -1,12 +1,11 @@
 <template>
-  <div class="container">
-    <h1>Trivia</h1>
+  <app-container>
     <p v-if="status == 'LOADING'">Loading trivia...</p>
     <p v-if="status == 'FAILED'">Failed to load trivia!</p>
     <div v-if="status == 'READY'">
       <div v-if="questionState != 'DONE'">
         <p>Score: {{ score }}</p>
-        <p><strong>Question {{questionNumber}}</strong></p>
+        <p><strong>Question {{ questionNumber }}</strong></p>
         <p><strong>{{ currentQuestion.category }}</strong><br/>({{ currentQuestion.difficulty }} difficulty)</p>
         <p class="trivia" v-html="currentQuestion.question"/>
         <trivia-list :question-state="questionState" :answers="currentQuestion.answers" @answer="verifyAnswer"/>
@@ -19,21 +18,21 @@
         <button @click="getTrivia()">Restart</button>
       </div>
     </div>
-    <hr/>
-    <p>&copy; Brian Lindner, 2019. Trivia questions taken from <a href="https://opentdb.com/">OpenTDB</a>.</p>
-  </div>
+  </app-container>
 </template>
 
 <script>
 import { getTrivia, getSessionToken } from '@/utils/opentriviadb'
 import TriviaList from '@/components/TriviaList'
+import AppContainer from '@/components/AppContainer'
 
 const questionsPerRound = 10
 
 export default {
   name: 'trivia-app',
   components: {
-    TriviaList
+    TriviaList,
+    AppContainer
   },
   data: () => ({
     // statuses: LOADING, FAILED, READY
