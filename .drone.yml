@@ -18,10 +18,17 @@ platform:
 
 steps:
 # Build the application (disregard caching node modules for now)
-- name: build
+- name: install
   image: node
   commands:
   - npm install
+- name: test
+  image: node
+  commands:
+  - npm run test:unit
+- name: build
+  image: node
+  commands:
   - npm run build
 # Publish to GitHub Pages
 - name: deploy
