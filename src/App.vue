@@ -1,19 +1,12 @@
 <template>
   <div id="app">
-    <TriviaApp />
+    <div id="nav">
+      <router-link to="/">Home</router-link> |
+      <router-link to="/about">About</router-link>
+    </div>
+    <router-view/>
   </div>
 </template>
-
-<script>
-import TriviaApp from './components/TriviaApp.vue'
-
-export default {
-  name: 'app',
-  components: {
-    TriviaApp
-  }
-}
-</script>
 
 <style>
 #app {
