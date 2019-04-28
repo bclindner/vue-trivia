@@ -9,11 +9,7 @@
         <p><strong>Question {{questionNumber}}</strong></p>
         <p><strong>{{ currentQuestion.category }}</strong><br/>({{ currentQuestion.difficulty }} difficulty)</p>
         <p class="trivia" v-html="currentQuestion.question"/>
-        <ol class="answer-list" type="A">
-          <li v-for="(answer, index) in currentQuestion.answers" :key="answer.text" @click="verifyAnswer(index)">
-            <div class="answer" :class="answerClassObject(answer.correct)" v-html="answer.text"/>
-          </li>
-        </ol>
+        <trivia-list :question-state="questionState" :answers="currentQuestion.answers" @answer="verifyAnswer"/>
         <p v-if="questionState == 'CORRECT'">Correct!</p>
         <p v-if="questionState == 'INCORRECT'">Incorrect...</p>
         <button v-if="readyToContinue" @click="goToNext()">Continue</button>
@@ -29,12 +25,16 @@
 </template>
 
 <script>
-import { getTrivia, getSessionToken } from '../utils/opentriviadb'
+import { getTrivia, getSessionToken } from '@/utils/opentriviadb'
+import TriviaList from '@/components/TriviaList'
 
 const questionsPerRound = 10
 
 export default {
   name: 'trivia-app',
+  components: {
+    TriviaList
+  },
   data: () => ({
     // statuses: LOADING, FAILED, READY
     status: 'LOADING',
@@ -86,16 +86,6 @@ export default {
       } else {
         this.questionState = 'DONE'
       }
-    },
-    answerClassObject (correct) {
-      switch (this.questionState) {
-        case 'CORRECT':
-        case 'INCORRECT':
-          return { correct, incorrect: !correct }
-        case 'ANSWERING':
-        default:
-          return { 'unknown': true }
-      }
     }
   },
   async mounted () {
@@ -111,35 +101,5 @@ export default {
   padding: 20px;
   max-width: 800px;
   background-color: #eee;
-}
-
-.answer-list {
-  padding: 0 12px;
-}
-.answer {
-  /* layout */
-  padding: 4px;
-  margin: 8px 0;
-  width: 100%;
-  /* behavior */
-  cursor: pointer;
-  user-select: none;
-  /* style */
-  border-radius: 2px;
-  color: white;
-  text-align: center;
-  transition: 0.2s ease;
-}
-.unknown {
-  background-color: #875fd7;
-}
-.unknown:hover {
-  background-color: #9f70ff;
-}
-.correct {
-  background-color: #3ee86b;
-}
-.incorrect {
-  background-color: #e84c3e;
 }
 </style>
