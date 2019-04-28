@@ -52,10 +52,12 @@ export default {
   },
   async mounted () {
     try {
-      this.categories = await getCategories()
+      // Get the categories, sort them, and add them; signal it's ready afterwards
+      const categories = await getCategories()
+      this.categories = categories.sort((categoryA, categoryB) => categoryA.name > categoryB.name ? 1 : -1)
       this.loading = false
     } catch (e) {
-      // if it doesn't work, no big deal; just don't show the user the option
+      // if it doesn't work, no big deal; just disable it
       console.error(e)
       this.disableCategories = true
       this.loading = false
