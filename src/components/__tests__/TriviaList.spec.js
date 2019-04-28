@@ -38,9 +38,9 @@ const mockTrueFalse = [
  * @param {Array<Object>} answers - Answers to pass as prop.
  * @param {String} questionState - State of the trivia game, to pass as prop.
  */
-const getWrapper = (answers, questionState = 'ANSWERING') => shallowMount(TriviaList, {
+const getWrapper = (answers, showAnswers = false) => shallowMount(TriviaList, {
   propsData: {
-    answers, questionState
+    answers, showAnswers
   }
 })
 
@@ -63,27 +63,26 @@ describe('TriviaList', () => {
       expect(params[0]).toBe(loopParam)
     )
   })
-  test('does not highlight correct/incorrect answers when state is ANSWERING', () => {
-    const wrapper = getWrapper(mockMultipleChoice, 'ANSWERING')
+  test('does not highlight correct/incorrect answers when showAnswers is false', () => {
+    const wrapper = getWrapper(mockMultipleChoice, false)
     expect(wrapper.findAll('.correct').length).toBe(0)
     expect(wrapper.findAll('.incorrect').length).toBe(0)
+    expect(wrapper.findAll('.unknown').length).toBe(4)
   })
-  test('highlights all answers with correct/incorrect when state is CORRECT', () => {
-    const wrapper = getWrapper(mockMultipleChoice, 'CORRECT')
+  test('highlights all answers with correct/incorrect when showAnswers is true', () => {
+    const wrapper = getWrapper(mockMultipleChoice, true)
     expect(wrapper.findAll('.correct').length).toBe(1)
     expect(wrapper.findAll('.incorrect').length).toBe(3)
+    expect(wrapper.findAll('.unknown').length).toBe(0)
   })
-  test('highlights all answers with correct/incorrect when state is INCORRECT', () => {
-    const wrapper = getWrapper(mockMultipleChoice, 'INCORRECT')
-    expect(wrapper.findAll('.correct').length).toBe(1)
-    expect(wrapper.findAll('.incorrect').length).toBe(3)
-  })
-  test('should transition state when state is changed from ANSWERING to CORRECT/INCORRECT', () => {
+  test('should transition state when showAnswers is changed from false to true', () => {
     const wrapper = getWrapper(mockMultipleChoice)
     expect(wrapper.findAll('.correct').length).toBe(0)
     expect(wrapper.findAll('.incorrect').length).toBe(0)
-    wrapper.setProps({ questionState: 'CORRECT' })
+    expect(wrapper.findAll('.unknown').length).toBe(4)
+    wrapper.setProps({ showAnswers: true })
     expect(wrapper.findAll('.correct').length).toBe(1)
     expect(wrapper.findAll('.incorrect').length).toBe(3)
+    expect(wrapper.findAll('.unknown').length).toBe(0)
   })
 })

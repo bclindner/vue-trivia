@@ -10,10 +10,9 @@
         </h3>
         <p><strong>{{ currentQuestion.category }}</strong><br/>({{ currentQuestion.difficulty }} difficulty)</p>
         <p class="trivia" v-html="currentQuestion.question"/>
-        <trivia-list :question-state="questionState" :answers="currentQuestion.answers" @answer="verifyAnswer"/>
-        <p v-if="questionState == 'CORRECT'">Correct!</p>
-        <p v-if="questionState == 'INCORRECT'">Incorrect...</p>
-        <button v-if="readyToContinue" @click="goToNext()">Continue</button>
+        <trivia-list :show-answers="questionAnswered" :answers="currentQuestion.answers" @answer="verifyAnswer"/>
+        <p v-if="questionAnswered">{{ answerResponse }}</p>
+        <button v-if="questionAnswered" @click="goToNext()">Continue</button>
       </div>
       <div v-else>
         <p>Your scored {{ score }} points!</p>
@@ -57,8 +56,17 @@ export default {
     sessionToken: ''
   }),
   computed: {
-    readyToContinue () {
+    questionAnswered () {
       return this.questionState === 'CORRECT' || this.questionState === 'INCORRECT'
+    },
+    answerResponse () {
+      if (this.questionState === 'CORRECT') {
+        return 'Correct!'
+      } else if (this.questionState === 'INCORRECT') {
+        return 'Incorrect...'
+      }
+      // this shouldn't be possible unless the state machine breaks
+      return null
     }
   },
   methods: {

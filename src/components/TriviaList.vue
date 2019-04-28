@@ -10,8 +10,8 @@
 export default {
   name: 'trivia-list',
   props: {
-    questionState: {
-      type: String,
+    showAnswers: {
+      type: Boolean,
       required: true
     },
     answers: {
@@ -21,14 +21,11 @@ export default {
   },
   methods: {
     answerClasses (correct) {
-      switch (this.questionState) {
-        case 'CORRECT':
-        case 'INCORRECT':
-          const incorrect = !correct
-          return { correct, incorrect }
-        case 'ANSWERING':
-        default:
-          return { 'unknown': true }
+      if (this.showAnswers) {
+        const incorrect = !correct
+        return { correct, incorrect }
+      } else {
+        return { 'unknown': true }
       }
     }
   }
