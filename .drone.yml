@@ -16,6 +16,13 @@ platform:
   os: linux
   arch: arm
 
+# Only build and deploy master.
+trigger:
+  branch:
+  - master
+  event:
+  - push
+
 steps:
 # Build the application (disregard caching node modules for now)
 - name: install
