@@ -1,18 +1,30 @@
 ---
+# This Drone config needs a few extra steps to work because GitHub needs SSH
+# authentication for the gh-pages plugin to work.
+#
+# The Drone publish plugin **MUST** use that full URL in the upstream name and
+# must also have its keys loaded in with the Drone CLI command below. It
+# won't work otherwise, afaict.
+# ```
+# drone secret add bclindner/vue-trivia ssh_key @path/to/github/ssh/key
+# ```
 kind: pipeline
 name: arm-build-deploy
 
+# This pipeline is for Raspberry Pi - change this when operating on another platform.
 platform:
   os: linux
   arch: arm
 
 steps:
+# Build the application (disregard caching node modules for now)
 - name: build
   image: node
   commands:
   - npm install
   - npm run build
-- name: publish
+# Publish to GitHub Pages
+- name: deploy
   image: plugins/gh-pages
   settings:
     ssh_key:
