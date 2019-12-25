@@ -38,8 +38,8 @@ export default {
 }
 .answer {
   /* layout */
-  padding: 4px;
-  margin: 8px 0;
+  padding: 0.5rem;
+  margin: 1rem 0;
   width: 100%;
   /* behavior */
   cursor: pointer;
