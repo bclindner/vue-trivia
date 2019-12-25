@@ -4,9 +4,8 @@
     <p v-if="status == 'FAILED'">Failed to load trivia!</p>
     <div v-if="status == 'READY'">
       <div v-if="questionState != 'DONE'">
-        <p>Score: {{ score }}</p>
         <h3>
-          Question {{ questionNumber }}
+          Question {{ questionNumber }}/{{ triviaList.length + questionNumber }} [Score: {{ score }}]
         </h3>
         <p><strong>{{ currentQuestion.category }}</strong><br/>({{ currentQuestion.difficulty }} difficulty)</p>
         <p class="trivia" v-html="currentQuestion.question"/>
@@ -25,6 +24,24 @@
   </div>
 </template>
 
+
+<style>
+  h3 {
+    position: absolute;
+    top: 0;
+  }
+  .trivia {
+    font-size: 120%;
+  }
+
+  button {
+    display: block;
+    margin: 0 auto;
+    padding: 0.5rem;
+  }
+</style>
+
+
 <script>
 import { getTrivia, getSessionToken } from '@/utils/opentriviadb'
 import TriviaList from '@/components/TriviaList'
@@ -33,12 +50,12 @@ export default {
   name: 'trivia-app',
   props: {
     questionsPerRound: {
-      type: String,
-      default: '10'
+      type: Number,
+      default: 10
     },
     categoryID: {
-      type: String,
-      default: '0'
+      type: Number,
+      default: 0
     }
   },
   components: {
