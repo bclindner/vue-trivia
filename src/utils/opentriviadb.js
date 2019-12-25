@@ -47,7 +47,17 @@ export const getCategories = async () => (await axios.get('https://opentdb.com/a
 
 /**
  * Get a session token for use in the OpenTDB API.
+ *
+ * Reads the token from the local storage if available
+ *
  * @returns {String} A session token to use in getTrivia.
  * @author Brian Lindner <brian@bclindner.com>
  */
-export const getSessionToken = async () => (await axios.get('https://opentdb.com/api_token.php?command=request')).data.token
+export const getSessionToken = async () => {
+  let token = localStorage.getItem('sessionToken');
+  if(!token) {
+    token = (await axios.get('https://opentdb.com/api_token.php?command=request')).data.token
+    localStorage.setItem('sessionToken', token)
+  }
+  return token;
+}
